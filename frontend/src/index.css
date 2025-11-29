@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+@layer base {
+    body {
+        @apply bg-slate-50 text-slate-900 antialiased;
+    }
+}
+
+@layer utilities {
+    .glass-panel {
+        @apply bg-white/80 backdrop-blur-lg border border-white/20 shadow-xl;
+    }
+
+    .card-hover {
+        @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5;
+    }
+}
