@@ -16,14 +16,14 @@ export const analyzeTodos = async (req: Request, res: Response, next: NextFuncti
             return;
         }
 
-        const validatedTodos: Todo[] = todos.filter((todo: any) => {
-            return todo && typeof todo === 'object' && typeof todo.title === 'string';
+        const validatedTodos: Todo[] = todos.filter((todo: unknown): todo is Todo => {
+            return todo !== null && typeof todo === 'object' && 'title' in todo && typeof todo.title === 'string';
         });
 
         const analysis = await analyzeTodosWithAI(validatedTodos);
         res.json(analysis);
-    } catch (error: any) {
-        if (error.message.includes("not configured")) {
+    } catch (error: unknown) {
+        if (error instanceof Error && error.message.includes("not configured")) {
             res.status(503).json({
                 error: "AI service is not configured. Please contact the administrator.",
                 details: error.message
@@ -31,7 +31,7 @@ export const analyzeTodos = async (req: Request, res: Response, next: NextFuncti
             return;
         }
 
-        if (error.message.includes("timed out")) {
+        if (error instanceof Error && error.message.includes("timed out")) {
             res.status(504).json({
                 error: "AI analysis timed out. Please try again.",
                 details: error.message

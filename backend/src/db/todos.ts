@@ -50,10 +50,10 @@ export const updateTodo = async (id: string, updates: UpdateTodoRequest): Promis
 
     // Build update expression
     let updateExpression = "set updatedAt = :updatedAt";
-    const expressionAttributeValues: any = {
+    const expressionAttributeValues: Record<string, string | boolean> = {
         ":updatedAt": timestamp,
     };
-    const expressionAttributeNames: any = {};
+    const expressionAttributeNames: Record<string, string> = {};
 
     if (updates.title !== undefined) {
         updateExpression += ", #title = :title";

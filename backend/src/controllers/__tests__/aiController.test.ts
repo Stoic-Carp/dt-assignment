@@ -10,12 +10,12 @@ describe('AI Controller', () => {
     let mockRequest: Partial<Request>;
     let mockResponse: Partial<Response>;
     let mockNext: NextFunction;
-    let responseJson: jest.Mock;
-    let responseStatus: jest.Mock;
+    let responseJson: jest.MockedFunction<Response['json']>;
+    let responseStatus: jest.MockedFunction<Response['status']>;
 
     beforeEach(() => {
-        responseJson = jest.fn().mockReturnThis();
-        responseStatus = jest.fn().mockReturnThis();
+        responseJson = jest.fn().mockReturnThis() as jest.MockedFunction<Response['json']>;
+        responseStatus = jest.fn().mockReturnThis() as jest.MockedFunction<Response['status']>;
 
         mockRequest = {
             body: {},
@@ -32,15 +32,15 @@ describe('AI Controller', () => {
     });
 
     describe('analyzeTodos', () => {
-        const mockTodos = [
-            {
-                id: '1',
-                title: 'Test todo',
-                completed: false,
-                createdAt: '2025-11-29T00:00:00Z',
-                updatedAt: '2025-11-29T00:00:00Z',
-            },
-        ];
+        const mockTodo1 = {
+            id: '1',
+            title: 'Test todo',
+            completed: false,
+            createdAt: '2025-11-29T00:00:00Z',
+            updatedAt: '2025-11-29T00:00:00Z',
+        };
+
+        const mockTodos = [mockTodo1];
 
         it('should return 400 if todos field is missing', async () => {
             mockRequest.body = {};
@@ -96,12 +96,20 @@ describe('AI Controller', () => {
         });
 
         it('should filter out invalid todos before analysis', async () => {
+            const validTodo2 = {
+                id: '3',
+                title: 'Valid todo',
+                completed: false,
+                createdAt: '2025-11-29T00:00:00Z',
+                updatedAt: '2025-11-29T00:00:00Z',
+            };
+
             const mixedTodos = [
-                mockTodos[0],
+                mockTodo1,
                 null,
                 { id: '2' }, // Missing title
                 'invalid',
-                { id: '3', title: 'Valid todo', completed: false },
+                validTodo2,
             ];
 
             mockRequest.body = { todos: mixedTodos };
@@ -122,8 +130,8 @@ describe('AI Controller', () => {
 
             // Should only pass valid todos (those with title)
             expect(aiService.analyzeTodosWithAI).toHaveBeenCalledWith([
-                mockTodos[0],
-                { id: '3', title: 'Valid todo', completed: false },
+                mockTodo1,
+                validTodo2,
             ]);
         });
 

@@ -104,8 +104,9 @@ describe('AI Service', () => {
 
             // Verify headers separately without checking the exact API key
             const fetchCall = (fetch as jest.MockedFunction<typeof fetch>).mock.calls[0];
-            if (fetchCall) {
-                const headers = (fetchCall[1] as any).headers;
+            if (fetchCall && fetchCall[1]) {
+                const options = fetchCall[1] as RequestInit;
+                const headers = options.headers as Record<string, string>;
                 expect(headers['Content-Type']).toBe('application/json');
                 expect(headers['Authorization']).toMatch(/^Bearer /);
             }
@@ -185,7 +186,7 @@ describe('AI Service', () => {
             (fetch as jest.MockedFunction<typeof fetch>).mockImplementationOnce(() => {
                 return new Promise((_, reject) => {
                     const error = new Error('The operation was aborted');
-                    (error as any).name = 'AbortError';
+                    error.name = 'AbortError';
                     reject(error);
                 });
             });

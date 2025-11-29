@@ -123,14 +123,14 @@ Provide analysis in this JSON format:
                 : undefined,
         };
 
-    } catch (error: any) {
-        if (error.name === 'AbortError') {
+    } catch (error: unknown) {
+        if (error instanceof Error && error.name === 'AbortError') {
             throw new Error("AI analysis request timed out. Please try again.");
         }
 
         console.error("Error calling OpenRouter API:", error);
 
-        if (error.message.includes("API error")) {
+        if (error instanceof Error && error.message.includes("API error")) {
             throw error;
         }
 
