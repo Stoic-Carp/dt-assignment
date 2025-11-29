@@ -3,6 +3,7 @@ import { getTodos, createTodo, updateTodo, deleteTodo, toggleTodo } from '../ser
 import type { Todo, CreateTodoRequest, UpdateTodoRequest } from '../types';
 import { AddTodo } from '../components/AddTodo';
 import { TodoList } from '../components/TodoList';
+import { AIAnalysis } from '../components/AIAnalysis';
 import { Loader2, CheckCircle2, ListTodo } from 'lucide-react';
 import { clsx } from 'clsx';
 
@@ -102,6 +103,8 @@ export const TodosPage: React.FC = () => {
 
                 <div className="space-y-8 animate-slide-up" style={{ animationDelay: '0.1s' }}>
                     <AddTodo onAdd={handleAddTodo} />
+
+                    <AIAnalysis todos={todos} />
 
                     <div className="bg-white/60 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 overflow-hidden min-h-[400px]">
                         <div className="p-4 border-b border-slate-100 flex gap-2 overflow-x-auto">

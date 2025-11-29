@@ -17,3 +17,13 @@ export interface UpdateTodoRequest {
     description?: string;
     completed?: boolean;
 }
+
+export interface AIAnalysisRequest {
+    todos: Todo[];
+}
+
+export interface AIAnalysisResponse {
+    summary: string;
+    insights: string[];
+    prioritySuggestions?: string[];
+}
