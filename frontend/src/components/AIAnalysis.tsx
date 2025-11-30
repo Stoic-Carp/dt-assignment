@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sparkles, Loader2, Brain, Lightbulb, Target, X, AlertCircle } from 'lucide-react';
 import type { Todo, AIAnalysisResponse } from '../types';
 import { analyzeWithAI } from '../services/ai';
@@ -8,11 +8,36 @@ interface AIAnalysisProps {
     todos: Todo[];
 }
 
+const LOADING_MESSAGES = [
+    "🧠 Waking up the AI brain...",
+    "🔍 Finding patterns in your tasks...",
+    "📊 Analyzing task complexity...",
+    "💡 Generating insights...",
+    "🎯 Prioritizing recommendations...",
+    "✨ Polishing suggestions...",
+    "🚀 Almost ready..."
+];
+
 export const AIAnalysis: React.FC<AIAnalysisProps> = ({ todos }) => {
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [analysis, setAnalysis] = useState<AIAnalysisResponse | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [isExpanded, setIsExpanded] = useState(false);
+    const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+
+    // Cycle through loading messages 
+    useEffect(() => {
+        if (!isAnalyzing) {
+            setLoadingMessageIndex(0);
+            return;
+        }
+
+        const interval = setInterval(() => {
+            setLoadingMessageIndex((prev) => (prev + 1) % LOADING_MESSAGES.length);
+        }, 2500);
+
+        return () => clearInterval(interval);
+    }, [isAnalyzing]);
 
     const handleAnalyze = async () => {
         setIsAnalyzing(true);
@@ -52,7 +77,7 @@ export const AIAnalysis: React.FC<AIAnalysisProps> = ({ todos }) => {
                 {isAnalyzing ? (
                     <>
                         <Loader2 className="w-5 h-5 animate-spin" />
-                        <span>Analyzing your tasks...</span>
+                        <span>{LOADING_MESSAGES[loadingMessageIndex]}</span>
                     </>
                 ) : (
                     <>
