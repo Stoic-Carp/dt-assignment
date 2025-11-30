@@ -112,8 +112,6 @@ export const TodosPage: React.FC = () => {
                 <div className="space-y-8 animate-slide-up" style={{ animationDelay: '0.1s' }}>
                     <AddTodo onAdd={handleAddTodo} />
 
-                    <AIAnalysis todos={todos} />
-
                     <TaskBreakdown
                         suggestions={taskBreakdown.suggestions}
                         selectedTasks={taskBreakdown.selectedTasks}
@@ -130,6 +128,8 @@ export const TodosPage: React.FC = () => {
                         onAddSelected={taskBreakdown.addSelectedTasks}
                         onClear={taskBreakdown.clearSuggestions}
                     />
+
+                    <AIAnalysis todos={todos} />
 
                     <div className="bg-white/60 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 overflow-hidden min-h-[400px]">
                         <div className="p-4 border-b border-slate-100 flex gap-2 overflow-x-auto">

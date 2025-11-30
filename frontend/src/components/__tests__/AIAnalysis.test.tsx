@@ -47,7 +47,22 @@ describe('AIAnalysis Component', () => {
         fireEvent.click(button);
 
         await waitFor(() => {
-            expect(screen.getByText(/Analyzing your tasks/i)).toBeInTheDocument();
+            // Check for any of the loading messages
+            const loadingMessages = [
+                /Waking up the AI brain/i,
+                /Finding patterns in your tasks/i,
+                /Analyzing task complexity/i,
+                /Generating insights/i,
+                /Prioritizing recommendations/i,
+                /Polishing suggestions/i,
+                /Almost ready/i
+            ];
+
+            const hasLoadingMessage = loadingMessages.some(pattern =>
+                screen.queryByText(pattern) !== null
+            );
+
+            expect(hasLoadingMessage).toBe(true);
         });
     });
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Wand2, Sparkles, AlertCircle } from 'lucide-react';
+import { Wand2, Sparkles, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { clsx } from 'clsx';
 import type { SuggestedTask } from '../types';
 import { TaskSuggestionsList } from './TaskSuggestionsList';
@@ -50,6 +50,7 @@ export const TaskBreakdown: React.FC<TaskBreakdownProps> = ({
     const [context, setContext] = useState('');
     const [showContext, setShowContext] = useState(false);
     const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+    const [isExpanded, setIsExpanded] = useState(false);
 
     // Cycle through loading messages
     React.useEffect(() => {
@@ -64,6 +65,13 @@ export const TaskBreakdown: React.FC<TaskBreakdownProps> = ({
 
         return () => clearInterval(interval);
     }, [isLoading]);
+
+    // Auto-expand when there are suggestions or errors
+    React.useEffect(() => {
+        if (suggestions.length > 0 || error) {
+            setIsExpanded(true);
+        }
+    }, [suggestions.length, error]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -80,21 +88,54 @@ export const TaskBreakdown: React.FC<TaskBreakdownProps> = ({
     };
 
     return (
-        <div className="space-y-6">
-            {/* Header */}
-            <div className="text-center">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                    <Wand2 className="w-6 h-6 text-emerald-600" />
-                    <h2 className="text-2xl font-bold text-slate-900">Break Down a Goal</h2>
-                    <Sparkles className="w-6 h-6 text-emerald-600" />
-                </div>
-                <p className="text-slate-600">
-                    Describe what you want to accomplish, and AI will suggest actionable sub-tasks
-                </p>
-            </div>
+        <div className="bg-white/60 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 overflow-hidden">
+            {/* Collapsed Header Button */}
+            {!isExpanded && (
+                <button
+                    onClick={() => setIsExpanded(true)}
+                    className="w-full px-6 py-5 flex items-center justify-between hover:bg-emerald-50/50 transition-colors duration-200"
+                >
+                    <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2">
+                            <Wand2 className="w-6 h-6 text-emerald-600" />
+                            <Sparkles className="w-5 h-5 text-emerald-500" />
+                        </div>
+                        <div className="text-left">
+                            <h2 className="text-lg font-bold text-slate-900">Break Down a Goal into Tasks</h2>
+                            <p className="text-sm text-slate-600">Use AI to generate actionable sub-tasks</p>
+                        </div>
+                    </div>
+                    <ChevronDown className="w-5 h-5 text-slate-400" />
+                </button>
+            )}
 
-            {/* Input Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Expanded Form */}
+            {isExpanded && (
+                <div className="space-y-6 p-6">
+                    {/* Header with Collapse Button */}
+                    <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                                <Wand2 className="w-6 h-6 text-emerald-600" />
+                                <h2 className="text-xl font-bold text-slate-900">Break Down a Goal</h2>
+                                <Sparkles className="w-5 h-5 text-emerald-500" />
+                            </div>
+                            <p className="text-sm text-slate-600">
+                                Describe what you want to accomplish, and AI will suggest actionable sub-tasks
+                            </p>
+                        </div>
+                        <button
+                            onClick={() => setIsExpanded(false)}
+                            disabled={isLoading}
+                            className="ml-4 p-2 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            title="Collapse"
+                        >
+                            <ChevronUp className="w-5 h-5 text-slate-400" />
+                        </button>
+                    </div>
+
+                    {/* Input Form */}
+                    <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                     <label htmlFor="goal" className="block text-sm font-semibold text-slate-700 mb-2">
                         What do you want to accomplish?
@@ -202,21 +243,23 @@ export const TaskBreakdown: React.FC<TaskBreakdownProps> = ({
                 </div>
             )}
 
-            {/* Suggestions List */}
-            {suggestions.length > 0 && !error && (
-                <TaskSuggestionsList
-                    suggestions={suggestions}
-                    selectedTasks={selectedTasks}
-                    editedTasks={editedTasks}
-                    reasoning={reasoning}
-                    isAddingTasks={isLoading}
-                    onToggleSelection={onToggleSelection}
-                    onSelectAll={onSelectAll}
-                    onDeselectAll={onDeselectAll}
-                    onUpdateTask={onUpdateTask}
-                    onRemoveTask={onRemoveTask}
-                    onAddSelected={onAddSelected}
-                />
+                    {/* Suggestions List */}
+                    {suggestions.length > 0 && !error && (
+                        <TaskSuggestionsList
+                            suggestions={suggestions}
+                            selectedTasks={selectedTasks}
+                            editedTasks={editedTasks}
+                            reasoning={reasoning}
+                            isAddingTasks={isLoading}
+                            onToggleSelection={onToggleSelection}
+                            onSelectAll={onSelectAll}
+                            onDeselectAll={onDeselectAll}
+                            onUpdateTask={onUpdateTask}
+                            onRemoveTask={onRemoveTask}
+                            onAddSelected={onAddSelected}
+                        />
+                    )}
+                </div>
             )}
         </div>
     );
