@@ -4,6 +4,8 @@ import type { Todo, CreateTodoRequest, UpdateTodoRequest } from '../types';
 import { AddTodo } from '../components/AddTodo';
 import { TodoList } from '../components/TodoList';
 import { AIAnalysis } from '../components/AIAnalysis';
+import { TaskBreakdown } from '../components/TaskBreakdown';
+import { useTaskBreakdown } from '../hooks/useTaskBreakdown';
 import { Loader2, CheckCircle2, ListTodo } from 'lucide-react';
 import { clsx } from 'clsx';
 
@@ -12,6 +14,12 @@ export const TodosPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
+
+    // Task breakdown hook
+    const taskBreakdown = useTaskBreakdown(() => {
+        // Refresh todos when tasks are added
+        fetchTodos();
+    });
 
     useEffect(() => {
         fetchTodos();
@@ -105,6 +113,23 @@ export const TodosPage: React.FC = () => {
                     <AddTodo onAdd={handleAddTodo} />
 
                     <AIAnalysis todos={todos} />
+
+                    <TaskBreakdown
+                        suggestions={taskBreakdown.suggestions}
+                        selectedTasks={taskBreakdown.selectedTasks}
+                        editedTasks={taskBreakdown.editedTasks}
+                        isLoading={taskBreakdown.isLoading}
+                        error={taskBreakdown.error}
+                        reasoning={taskBreakdown.reasoning}
+                        onGenerate={taskBreakdown.generateBreakdown}
+                        onToggleSelection={taskBreakdown.toggleTaskSelection}
+                        onSelectAll={taskBreakdown.selectAll}
+                        onDeselectAll={taskBreakdown.deselectAll}
+                        onUpdateTask={taskBreakdown.updateTask}
+                        onRemoveTask={taskBreakdown.removeTask}
+                        onAddSelected={taskBreakdown.addSelectedTasks}
+                        onClear={taskBreakdown.clearSuggestions}
+                    />
 
                     <div className="bg-white/60 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 overflow-hidden min-h-[400px]">
                         <div className="p-4 border-b border-slate-100 flex gap-2 overflow-x-auto">
