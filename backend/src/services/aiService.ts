@@ -1,9 +1,9 @@
 import dotenv from "dotenv";
 import { Todo, AIAnalysisResponse } from "../types";
+import { getOpenRouterApiKey } from "../utils/secrets";
 
 dotenv.config();
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const AI_MODEL = process.env.AI_MODEL || "nvidia/nemotron-nano-12b-v2-vl:free";
 const AI_MAX_TOKENS = parseInt(process.env.AI_MAX_TOKENS || "500", 10);
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
@@ -22,9 +22,8 @@ interface OpenRouterResponse {
 }
 
 export async function analyzeTodosWithAI(todos: Todo[]): Promise<AIAnalysisResponse> {
-    if (!OPENROUTER_API_KEY) {
-        throw new Error("OPENROUTER_API_KEY is not configured");
-    }
+    // Fetch API key from environment or Secrets Manager
+    const OPENROUTER_API_KEY = await getOpenRouterApiKey();
 
     if (todos.length === 0) {
         return {

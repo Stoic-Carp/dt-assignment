@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import { TaskBreakdownRequest, TaskBreakdownResponse, SuggestedTask } from "../types";
+import { getOpenRouterApiKey } from "../utils/secrets";
 
 dotenv.config();
 
@@ -108,15 +109,13 @@ function validateLLMResponse(response: unknown): { valid: boolean; data?: { sugg
 }
 
 export async function generateTaskBreakdown(request: TaskBreakdownRequest): Promise<TaskBreakdownResponse> {
+    // Fetch API key from environment or Secrets Manager
+    const OPENROUTER_API_KEY = await getOpenRouterApiKey();
+    
     // Read configuration dynamically to support testing
-    const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
     const AI_MODEL = process.env.AI_MODEL || "nvidia/nemotron-nano-12b-v2-vl:free";
     const TASK_BREAKDOWN_MAX_TOKENS = parseInt(process.env.TASK_BREAKDOWN_MAX_TOKENS || "800", 10);
     const TASK_BREAKDOWN_MAX_TASKS = parseInt(process.env.TASK_BREAKDOWN_MAX_TASKS || "8", 10);
-
-    if (!OPENROUTER_API_KEY) {
-        throw new Error("OPENROUTER_API_KEY is not configured");
-    }
 
     // Validate and sanitize input
     const validation = validateGoal(request.goal);

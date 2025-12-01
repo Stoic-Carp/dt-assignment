@@ -84,7 +84,34 @@ Deploy the application to AWS using Terragrunt and Docker.
 - Terraform and Terragrunt installed
 - Docker running
 
-### Step 1: Deploy Infrastructure
+### Step 1: Install Backend Dependencies
+
+Install required dependencies including AWS Secrets Manager SDK:
+
+```bash
+cd backend
+npm install
+```
+
+### Step 2: Store API Key Securely
+
+**IMPORTANT**: Store your OpenRouter API key in AWS Secrets Manager (never commit it to code!).
+
+1. **Get your OpenRouter API Key**:
+   - Sign up at [OpenRouter](https://openrouter.ai/)
+   - Create an API key from your dashboard
+
+2. **Store in AWS Secrets Manager**:
+   ```bash
+   aws secretsmanager create-secret \
+       --name "todo-list/openrouter-api-key" \
+       --secret-string "YOUR_API_KEY_HERE" \
+       --region ap-southeast-1 \
+       --description "OpenRouter API key for Todo List AI features"
+   ```
+   Replace `YOUR_API_KEY_HERE` with your actual API key.
+
+### Step 3: Deploy Infrastructure
 Deploy the full infrastructure (ECR, Lambda, DynamoDB, API Gateway, S3).
 
 ```bash
@@ -94,7 +121,7 @@ terragrunt apply
 ```
 *Type `y` to confirm. This will automatically provision ECR and push a placeholder image to allow Lambda creation.*
 
-### Step 2: Build and Deploy Backend
+### Step 4: Build and Deploy Backend
 Deploy the actual application code using the provided helper script.
 
 ```bash
@@ -107,7 +134,7 @@ cd ../../../
 3. *Push the image to ECR*
 4. *Update the Lambda function*
 
-### Step 3: Deploy Frontend
+### Step 5: Deploy Frontend
 Build and upload the frontend to the S3 bucket.
 
 1. **Update API URL**:
@@ -130,3 +157,24 @@ Build and upload the frontend to the S3 bucket.
 
 4. **Access Application**:
    Open the S3 website URL provided in the Terragrunt outputs.
+
+---
+
+## 3. Security Notes
+
+### API Key Storage
+
+This deployment uses **AWS Secrets Manager** to securely store the OpenRouter API key:
+
+
+### Local Development
+
+For local development, you can still use environment variables:
+
+```bash
+# backend/.env
+OPENROUTER_API_KEY=YOUR_API_KEY
+AWS_REGION=ap-southeast-1
+```
+
+The code automatically detects whether to use Secrets Manager (AWS) or environment variables (local).

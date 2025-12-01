@@ -47,3 +47,21 @@ resource "aws_iam_role_policy" "dynamodb_access" {
     ]
   })
 }
+
+resource "aws_iam_role_policy" "secrets_access" {
+  name = "${var.project_name}-${var.environment}-secrets-access"
+  role = aws_iam_role.lambda_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue"
+        ]
+        Resource = "arn:aws:secretsmanager:*:*:secret:todo-list/*"
+      }
+    ]
+  })
+}

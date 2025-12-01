@@ -24,6 +24,7 @@ services:
       - AWS_ACCESS_KEY_ID=local
       - AWS_SECRET_ACCESS_KEY=local
       - CORS_ORIGIN=http://localhost:3000
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}  # Reads from .env file or system env
     depends_on:
       - dynamodb-local
 
