@@ -11,8 +11,17 @@ You can run the application either fully containerized or manually.
 Run the entire application in containers as it would run in production.
 **Note**: This mode does **not** support hot reloading. Use Option B for development.
 
+**Setup**: Create a `.env` file in the project root (if testing AI features):
+
 ```bash
-docker compose -f docker-compose-build.yml up -d --build
+# .env (in project root)
+OPENROUTER_API_KEY=sk-or-v1-your-key-here
+```
+
+**Run**:
+
+```bash
+docker compose -f docker-compose-build.yml up -d --build  
 ```
 
 - **Frontend**: [http://localhost:3000](http://localhost:3000)
@@ -178,3 +187,39 @@ AWS_REGION=ap-southeast-1
 ```
 
 The code automatically detects whether to use Secrets Manager (AWS) or environment variables (local).
+
+## 4. Performance & Timeout Configuration
+
+### Understanding Timeout Limits
+
+The application has multiple timeout layers:
+
+1. **API Gateway**: Hard limit of **29 seconds** for HTTP requests
+2. **Lambda Function**: Configurable up to **15 minutes** (currently set to 60 seconds)
+3. **OpenRouter API**: Configurable via `OPENROUTER_TIMEOUT_MS` (default: 25 seconds)
+
+### Handling OpenRouter Timeouts
+
+If you experience timeouts with AI features, you can adjust:
+
+**In Terragrunt (`infrastructure/environments/dev/terragrunt.hcl`):**
+```hcl
+environment_variables = {
+  OPENROUTER_TIMEOUT_MS        = "25000"  # 25 seconds (must be < 29s for API Gateway)
+  TASK_BREAKDOWN_MAX_TOKENS    = "8000"   # Reduce for faster responses
+  AI_MODEL                     = "..."    # Consider using a faster model
+}
+```
+
+**Tips to reduce timeouts:**
+- Use faster AI models (smaller models respond quicker)
+- Reduce `TASK_BREAKDOWN_MAX_TOKENS` for shorter responses
+- Reduce `TASK_BREAKDOWN_MAX_TASKS` to generate fewer subtasks
+
+### Checking Lambda Logs
+
+View real-time logs to debug issues:
+
+```bash
+aws logs tail /aws/lambda/todo-list-api-dev --follow --region ap-southeast-1
+```

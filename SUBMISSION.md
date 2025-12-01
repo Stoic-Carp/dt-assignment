@@ -4,23 +4,101 @@
 
 This submission implements **Option 2: AI Integration** from the interview assignment.
 
-### Core Feature 1: AI Task Analysis
+### Feature 1: AI Task Analysis
 
 Analyzes existing todos and provides intelligent insights, summaries, and priority suggestions.
 
-### Core Feature 2: AI Task Breakdown
+### Feature 2: AI Task Breakdown
 
 Converts high-level goals into actionable sub-tasks. Users input a goal (e.g., "Plan a camping trip"), and AI generates specific, actionable tasks that can be reviewed, edited, and selectively added to the todo list.
 
+In addition, AWS Secrets Manager is integrated into the deployment process to handle the OpenRouter API key. 
+[Updated Deployment Process](./DEPLOYMENT.md)
+
 ## Quick Start
+
+View the deployed web app here: [Todo List with AI Features](http://todo-list-frontend-dev-486778105981.s3-website-ap-southeast-1.amazonaws.com/todos) 
+
+For a quick overview, visit the [screenshots section](#features-demo)
+
+Recommended Steps: 
+1. Use the AI Task Breakdown to generate tasks from a high level goal 
+2. Review, edit (optional) and then add the suggested tasks to the task list  
+3. Use AI Task Analysis feature to gain insights and recommendations 
+
+### Option A: Full Stack with Docker (Production Preview)
+
+Run the entire application in containers:
+
+**Setup**: Create a `.env` file in the project root (if testing AI features):
+
+```bash
+# .env (in project root)
+OPENROUTER_API_KEY=sk-or-v1-your-key-here
+```
+
+**Run**:
 
 ```bash
 docker compose -f docker-compose-build.yml up -d --build  
 ```
 
-- **Frontend**: [http://localhost:3000](http://localhost:3000)
+**Or pass the API key inline**:
 
+```bash
+OPENROUTER_API_KEY=sk-or-v1-your-key-here docker compose -f docker-compose-build.yml up -d --build
+```
+
+**Access**:
+- **Frontend**: [http://localhost:3000](http://localhost:3000)
 - **Backend**: [http://localhost:3001](http://localhost:3001)
+- **DynamoDB Local**: [http://localhost:8000](http://localhost:8000)
+
+**Note**: 
+This mode does **not** support hot reloading. Use Option B for development.
+Depending on your system, you may need to modify permissions for your local "shared-local-instance.db" file. 
+
+### Option B: Local Development (Hot Reloading)
+
+For active development with hot-reloading enabled.
+
+#### Prerequisites
+- Node.js (v18+)
+- Docker (for local DynamoDB only)
+
+#### Step 1: Start Local Database
+
+```bash
+docker compose -f docker-compose-dynamodb.yml up -d
+```
+
+*Starts DynamoDB Local on port 8000.*
+
+#### Step 2: Start Backend
+
+```bash
+cd backend
+npm install
+cp .env.example .env
+# Edit .env and add your OPENROUTER_API_KEY
+npm run dev
+```
+
+*Backend runs on [http://localhost:3001](http://localhost:3001)*
+
+#### Step 3: Start Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+*Frontend runs on [http://localhost:5173](http://localhost:5173) (or similar port)*
+
+---
+
+### Features Demo
 
 Main page with new features, some sample tasks are preloaded into the database for trying out:
 ![Main page with features](/screenshots/main_features.png "New Features")
@@ -127,24 +205,7 @@ Generates actionable sub-tasks from high-level goals.
 
 ---
 
-### Shared Infrastructure
 
-**Environment Configuration** (`.env.example`):
-
-```bash
-OPENROUTER_API_KEY=your-api-key-here
-AI_MODEL=z-ai/glm-4.5-air:free
-AI_MAX_TOKENS=80000
-TASK_BREAKDOWN_MAX_TOKENS=80000
-TASK_BREAKDOWN_MAX_TASKS=7
-```
-
-**Technology Stack**:
-
-- LLM Provider: OpenRouter (free tier models)
-- Backend: Node.js + TypeScript + Express
-- Frontend: React 19 + Vite + Tailwind CSS 4
-- Testing: Jest + Supertest (backend), Vitest + React Testing Library (frontend)
 
 ## Files Added and Modified
 
@@ -201,6 +262,7 @@ TASK_BREAKDOWN_MAX_TASKS=7
 - `CLAUDE.md` - Comprehensive codebase guide with implementation plan
 - `backend/TESTING.md` - Testing strategy and execution guide
 - `SUBMISSION.md` - This file
+
 
 ---
 
@@ -262,7 +324,6 @@ Separated AI logic from HTTP handling (services vs controllers) for better testa
 
 - Free tier LLM models (no cost for development/testing)
 - Unified API for multiple AI models
-- 10-15 second timeouts to prevent hanging requests
 
 ### 3. Rate Limiting
 
@@ -317,41 +378,13 @@ Custom in-memory rate limiter for task breakdown endpoint (10 requests/minute pe
 
 ---
 
-## Assignment Requirements Checklist
 
-### Core Requirements
 
-- [x] **Backend Implementation**
-  - [x] AI service integration (OpenRouter API)
-  - [x] API endpoint for analysis
-  - [x] Error handling
-  - [x] Type safety
-  - [x] Environment configuration
+## Development Details 
 
-- [x] **Frontend Implementation**
-  - [x] AI analysis component
-  - [x] UI/UX design
-  - [x] Loading states
-  - [x] Error handling
-  - [x] Integration with existing app
 
-- [x] **Testing**
-  - [x] Backend unit tests (18 tests)
-  - [x] Backend integration tests (17 tests)
-  - [x] Frontend tests (11 tests)
-  - [x] Real API integration tests
-
-- [x] **Documentation**
-  - [x] CLAUDE.md (codebase guide)
-  - [x] SUBMISSION.md (this file)
-  - [x] Updated .env.example files
-
-## Contact
-
-For questions or clarifications about this implementation, please refer to:
 
 - `CLAUDE.md` - Development guide used with Claude Code for this assignment
 
 ---
 
-**Implementation Date**: November 30, 2025
