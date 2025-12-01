@@ -116,6 +116,7 @@ export async function generateTaskBreakdown(request: TaskBreakdownRequest): Prom
     const AI_MODEL = process.env.AI_MODEL || "nvidia/nemotron-nano-12b-v2-vl:free";
     const TASK_BREAKDOWN_MAX_TOKENS = parseInt(process.env.TASK_BREAKDOWN_MAX_TOKENS || "800", 10);
     const TASK_BREAKDOWN_MAX_TASKS = parseInt(process.env.TASK_BREAKDOWN_MAX_TASKS || "8", 10);
+    const OPENROUTER_TIMEOUT_MS = parseInt(process.env.OPENROUTER_TIMEOUT_MS || "20000", 10); // 20 seconds default
 
     // Validate and sanitize input
     const validation = validateGoal(request.goal);
@@ -163,7 +164,7 @@ Return JSON in this exact format:
 
     try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+        const timeoutId = setTimeout(() => controller.abort(), OPENROUTER_TIMEOUT_MS);
 
         const response = await fetch(OPENROUTER_API_URL, {
             method: "POST",

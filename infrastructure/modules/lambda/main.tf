@@ -3,7 +3,7 @@ resource "aws_lambda_function" "api" {
   role          = var.role_arn
   package_type  = "Image"
   image_uri     = var.image_uri
-  timeout       = 30
+  timeout       = 60
   memory_size   = 512
 
   environment {

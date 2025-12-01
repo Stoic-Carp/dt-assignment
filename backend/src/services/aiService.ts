@@ -24,6 +24,7 @@ interface OpenRouterResponse {
 export async function analyzeTodosWithAI(todos: Todo[]): Promise<AIAnalysisResponse> {
     // Fetch API key from environment or Secrets Manager
     const OPENROUTER_API_KEY = await getOpenRouterApiKey();
+    const OPENROUTER_TIMEOUT_MS = parseInt(process.env.OPENROUTER_TIMEOUT_MS || "20000", 10); // 20 seconds default
 
     if (todos.length === 0) {
         return {
@@ -66,7 +67,7 @@ Provide analysis in this JSON format:
 
     try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        const timeoutId = setTimeout(() => controller.abort(), OPENROUTER_TIMEOUT_MS);
 
         const response = await fetch(OPENROUTER_API_URL, {
             method: "POST",
